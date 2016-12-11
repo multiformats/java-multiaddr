@@ -18,7 +18,7 @@ MultiAddress m = new MultiAddress("/ipfs/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7ki
 ```
 
 ## Dependency
-You can use this project by building the JAR file as specified below, or by using [JitPack](https://jitpack.io/#multiformats/java-multihash/) (also supporting Gradle, SBT, etc).
+You can use this project by building the JAR file as specified below, or by using [JitPack](https://jitpack.io/#multiformats/java-multiaddr/) (also supporting Gradle, SBT, etc).
 
 for Maven, you can add the follwing sections to your POM.XML:
 ```
