@@ -1,4 +1,4 @@
-package org.ipfs.api;
+package io.ipfs.multiaddr;
 
 import java.math.*;
 
