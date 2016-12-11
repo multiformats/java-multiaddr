@@ -1,4 +1,4 @@
-package org.ipfs.api;
+package io.ipfs.multiaddr;
 
 import org.junit.*;
 
@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
-public class MultiAddressTests {
+public class MultiAddressTest {
 
     @Test
     public void fails() {
