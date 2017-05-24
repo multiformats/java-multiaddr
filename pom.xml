@@ -4,7 +4,7 @@
 
 	<groupId>io.ipfs</groupId>
 	<artifactId>multiaddr</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<packaging>jar</packaging>
 
 	<name>multiaddr</name>
@@ -58,8 +58,18 @@
 		</dependency>
 		<dependency>
 			<groupId>com.github.multiformats</groupId>
-			<artifactId>java-multihash</artifactId>
+			<artifactId>java-multibase</artifactId>
 			<version>v1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.multiformats</groupId>
+			<artifactId>java-multihash</artifactId>
+			<version>v1.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.ipld</groupId>
+			<artifactId>java-cid</artifactId>
+			<version>v1.1.0</version>
 		</dependency>
 	</dependencies>
 
