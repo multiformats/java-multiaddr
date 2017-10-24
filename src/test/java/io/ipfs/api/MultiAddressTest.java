@@ -36,7 +36,9 @@ public class MultiAddressTest {
                 "/ip4/127.0.0.1/tcp/jfodsajfidosajfoidsa",
                 "/ip4/127.0.0.1/tcp",
                 "/ip4/127.0.0.1/ipfs",
-                "/ip4/127.0.0.1/ipfs/tcp"
+                "/ip4/127.0.0.1/ipfs/tcp",
+                "/quic/65536",
+                "/unix"
         ).flatMap(s -> {
             try {
                 new MultiAddress(s);
@@ -79,7 +81,11 @@ public class MultiAddressTest {
                 "/ip4/127.0.0.1/tcp/1234",
                 "/ip4/127.0.0.1/tcp/1234/",
                 "/ip4/127.0.0.1/ipfs/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC",
-                "/ip4/127.0.0.1/ipfs/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC/tcp/1234"
+                "/ip4/127.0.0.1/ipfs/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC/tcp/1234",
+                "/unix/a/b/c/d/e",
+                "/unix/stdio",
+                "/ip4/1.2.3.4/tcp/80/unix/a/b/c/d/e/f",
+                "/ip4/127.0.0.1/ipfs/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC/tcp/1234/unix/stdio"
         ).flatMap(s -> {
             try {
                 new MultiAddress(s);

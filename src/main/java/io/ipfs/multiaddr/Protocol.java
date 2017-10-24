@@ -19,7 +19,9 @@ public class Protocol {
         SCTP(132, 16, "sctp"),
         UTP(301, 0, "utp"),
         UDT(302, 0, "udt"),
+        UNIX(400, LENGTH_PREFIXED_VAR_SIZE, "unix"),
         IPFS(421, LENGTH_PREFIXED_VAR_SIZE, "ipfs"),
+        QUIC(460, 0, "quic"),
         HTTPS(443, 0, "https"),
         HTTP(480, 0, "http"),
         ONION(444, 80, "onion");
@@ -50,6 +52,10 @@ public class Protocol {
 
     public void appendCode(OutputStream out) throws IOException {
         out.write(type.encoded);
+    }
+
+    public boolean isTerminal() {
+        return type == Type.UNIX;
     }
 
     public int size() {
@@ -95,22 +101,22 @@ public class Protocol {
                     bout.write(varint);
                     bout.write(hashBytes);
                     return bout.toByteArray();
-                case ONION:
+                case ONION: {
                     String[] split = addr.split(":");
                     if (split.length != 2)
-                        throw new IllegalStateException("Onion address needs a port: "+addr);
+                        throw new IllegalStateException("Onion address needs a port: " + addr);
 
                     // onion address without the ".onion" substring
                     if (split[0].length() != 16)
-                        throw new IllegalStateException("failed to parse "+name()+" addr: "+addr+" not a Tor onion address.");
+                        throw new IllegalStateException("failed to parse " + name() + " addr: " + addr + " not a Tor onion address.");
 
                     byte[] onionHostBytes = Base32.decode(split[0].toUpperCase());
                     int port = Integer.parseInt(split[1]);
                     if (port > 65535)
-                        throw new IllegalStateException("Port is > 65535: "+port);
+                        throw new IllegalStateException("Port is > 65535: " + port);
 
                     if (port < 1)
-                        throw new IllegalStateException("Port is < 1: "+port);
+                        throw new IllegalStateException("Port is < 1: " + port);
 
                     ByteArrayOutputStream b = new ByteArrayOutputStream();
                     DataOutputStream dout = new DataOutputStream(b);
@@ -118,6 +124,20 @@ public class Protocol {
                     dout.writeShort(port);
                     dout.flush();
                     return b.toByteArray();
+                }
+                case UNIX: {
+                    if (addr.startsWith("/"))
+                        addr = addr.substring(1);
+                    byte[] path = addr.getBytes();
+                    ByteArrayOutputStream b = new ByteArrayOutputStream();
+                    DataOutputStream dout = new DataOutputStream(b);
+                    byte[] length = new byte[(32 - Integer.numberOfLeadingZeros(path.length)+6)/7];
+                    putUvarint(length, path.length);
+                    dout.write(length);
+                    dout.write(path);
+                    dout.flush();
+                    return b.toByteArray();
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -131,11 +151,11 @@ public class Protocol {
         switch (type) {
             case IP4:
                 buf = new byte[sizeForAddress];
-                in.read(buf);
+                read(in, buf);
                 return Inet4Address.getByAddress(buf).toString().substring(1);
             case IP6:
                 buf = new byte[sizeForAddress];
-                in.read(buf);
+                read(in, buf);
                 return Inet6Address.getByAddress(buf).toString().substring(1);
             case TCP:
             case UDP:
@@ -144,15 +164,32 @@ public class Protocol {
                 return Integer.toString((in.read() << 8) | (in.read()));
             case IPFS:
                 buf = new byte[sizeForAddress];
-                in.read(buf);
+                read(in, buf);
                 return Cid.cast(buf).toString();
             case ONION:
                 byte[] host = new byte[10];
-                in.read(host);
+                read(in, host);
                 String port = Integer.toString((in.read() << 8) | (in.read()));
                 return Base32.encode(host)+":"+port;
+            case UNIX:
+                buf = new byte[sizeForAddress];
+                read(in, buf);
+                return new String(buf);
         }
-        throw new IllegalStateException("Unimplemented protocl type: "+type.name);
+        throw new IllegalStateException("Unimplemented protocol type: "+type.name);
+    }
+
+    private static void read(InputStream in, byte[] b) throws IOException {
+        read(in, b, 0, b.length);
+    }
+
+    private static void read(InputStream in, byte[] b, int offset, int len) throws IOException {
+        int total=0, r=0;
+        while (total < len && r != -1) {
+            r = in.read(b, offset + total, len - total);
+            if (r >=0)
+                total += r;
+        }
     }
 
     public int sizeForAddress(InputStream in) throws IOException {

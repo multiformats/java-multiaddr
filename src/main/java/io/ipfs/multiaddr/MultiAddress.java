@@ -4,6 +4,7 @@ import io.ipfs.multihash.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.*;
 
 public class MultiAddress
 {
@@ -67,11 +68,15 @@ public class MultiAddress
                 if (p.size() == 0)
                     continue;
 
-                String component = parts[i++];
+                String component = p.isTerminal() ?
+                        Stream.of(Arrays.copyOfRange(parts, i, parts.length)).reduce("", (a, b) -> a + "/" + b) :
+                        parts[i++];
                 if (component.length() == 0)
                     throw new IllegalStateException("Protocol requires address, but non provided!");
 
                 bout.write(p.addressToBytes(component));
+                if (p.isTerminal())
+                    break;
             }
             return bout.toByteArray();
         } catch (IOException e) {
