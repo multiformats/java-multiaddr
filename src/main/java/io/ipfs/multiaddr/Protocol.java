@@ -16,15 +16,20 @@ public class Protocol {
         UDP(17, 16, "udp"),
         DCCP(33, 16, "dccp"),
         IP6(41, 128, "ip6"),
+        DNS4(54, LENGTH_PREFIXED_VAR_SIZE, "dns4"),
+        DNS6(55, LENGTH_PREFIXED_VAR_SIZE, "dns6"),
+        DNSADDR(56, LENGTH_PREFIXED_VAR_SIZE, "dnsaddr"),
         SCTP(132, 16, "sctp"),
         UTP(301, 0, "utp"),
         UDT(302, 0, "udt"),
         UNIX(400, LENGTH_PREFIXED_VAR_SIZE, "unix"),
         IPFS(421, LENGTH_PREFIXED_VAR_SIZE, "ipfs"),
-        QUIC(460, 0, "quic"),
         HTTPS(443, 0, "https"),
-        HTTP(480, 0, "http"),
-        ONION(444, 80, "onion");
+        ONION(444, 80, "onion"),
+        QUIC(460, 0, "quic"),
+        WS(477, 0, "ws"),
+        P2PCIRCUIT(290, 0, "p2p-circuit"),
+        HTTP(480, 0, "http");
 
         public final int code, size;
         public final String name;
@@ -92,15 +97,16 @@ public class Protocol {
                     if (x > 65535)
                         throw new IllegalStateException("Failed to parse "+type.name+" address "+addr + " (> 65535");
                     return new byte[]{(byte)(x >>8), (byte)x};
-                case IPFS:
+                case IPFS: {
                     Multihash hash = Cid.decode(addr);
                     ByteArrayOutputStream bout = new ByteArrayOutputStream();
                     byte[] hashBytes = hash.toBytes();
-                    byte[] varint = new byte[(32 - Integer.numberOfLeadingZeros(hashBytes.length)+6)/7];
+                    byte[] varint = new byte[(32 - Integer.numberOfLeadingZeros(hashBytes.length) + 6) / 7];
                     putUvarint(varint, hashBytes.length);
                     bout.write(varint);
                     bout.write(hashBytes);
                     return bout.toByteArray();
+                }
                 case ONION: {
                     String[] split = addr.split(":");
                     if (split.length != 2)
@@ -138,11 +144,23 @@ public class Protocol {
                     dout.flush();
                     return b.toByteArray();
                 }
+                case DNS4:
+                case DNS6:
+                case DNSADDR: {
+                    ByteArrayOutputStream bout = new ByteArrayOutputStream();
+                    byte[] hashBytes = addr.getBytes();
+                    byte[] varint = new byte[(32 - Integer.numberOfLeadingZeros(hashBytes.length) + 6) / 7];
+                    putUvarint(varint, hashBytes.length);
+                    bout.write(varint);
+                    bout.write(hashBytes);
+                    return bout.toByteArray();
+                }
+                default:
+                    throw new IllegalStateException("Unknown multiaddr type: " + type);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        throw new IllegalStateException("Failed to parse address: "+addr);
     }
 
     public String readAddress(InputStream in) throws IOException {
@@ -172,6 +190,12 @@ public class Protocol {
                 String port = Integer.toString((in.read() << 8) | (in.read()));
                 return Base32.encode(host)+":"+port;
             case UNIX:
+                buf = new byte[sizeForAddress];
+                read(in, buf);
+                return new String(buf);
+            case DNS4:
+            case DNS6:
+            case DNSADDR:
                 buf = new byte[sizeForAddress];
                 read(in, buf);
                 return new String(buf);
