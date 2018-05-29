@@ -38,7 +38,7 @@ for Maven, you can add the follwing sections to your POM.XML:
     <dependency>
       <groupId>com.github.multiformats</groupId>
       <artifactId>java-multiaddr</artifactId>
-      <version>v1.1.1</version>
+      <version>$latest_version</version>
     </dependency>
   </dependencies>
 ```
