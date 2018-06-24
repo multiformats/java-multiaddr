@@ -155,6 +155,17 @@ public class MultiAddressTest {
         test.accept("/ip4/127.0.0.1/udp/1234/ip4/127.0.0.1/tcp/4321", "047f0000011104d2047f0000010610e1");
     }
 
+   @Test
+    public void dns() {
+       String dns = "mydomain.com";
+       int port = 5001;
+       String address = "/dns6/"+dns+"/tcp/"+port+"/https";
+       MultiAddress multiAddress = new MultiAddress(address);
+       
+       Assert.assertEquals("host should be equal to " + dns, dns, multiAddress.getHost());
+       Assert.assertEquals("port should be equal to " + port, port, multiAddress.getTCPPort());
+    }
+
     public static byte[] fromHex(String hex) {
         if (hex.length() % 2 != 0)
             throw new IllegalStateException("Uneven number of hex digits!");
