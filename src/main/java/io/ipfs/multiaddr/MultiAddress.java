@@ -40,7 +40,7 @@ public class MultiAddress
 
     public String getHost() {
         String[] parts = toString().substring(1).split("/");
-        if (parts[0].startsWith("ip"))
+        if (parts[0].startsWith("ip") || parts[0].startsWith("dns"))
             return parts[1];
         throw new IllegalStateException("This multiaddress doesn't have a host: "+toString());
     }
