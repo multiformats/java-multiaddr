@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>io.ipfs</groupId>
-	<artifactId>multiaddr</artifactId>
-	<version>1.3.0</version>
+    <groupId>com.github.multiformats</groupId>
+    <artifactId>java-multiaddr</artifactId>
+	<version>v1.3.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>multiaddr</name>
@@ -32,8 +32,9 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<junit.version>4.12</junit.version>
-		<hamcrest.version>1.3</hamcrest.version>
+        <version.junit>4.12</version.junit>
+        <version.hamcrest>1.3</version.hamcrest>
+        <version.cid>v1.1.0</version.cid>
 	</properties>
 
 	<repositories>
@@ -44,33 +45,23 @@
 	</repositories>
 
 	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-core</artifactId>
-			<version>${hamcrest.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.github.multiformats</groupId>
-			<artifactId>java-multibase</artifactId>
-			<version>v1.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.github.multiformats</groupId>
-			<artifactId>java-multihash</artifactId>
-			<version>v1.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.github.ipld</groupId>
-			<artifactId>java-cid</artifactId>
-			<version>v1.1.0</version>
-		</dependency>
+        <dependency>
+            <groupId>com.github.ipld</groupId>
+            <artifactId>java-cid</artifactId>
+            <version>${version.cid}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${version.junit}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>${version.hamcrest}</version>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 
 	<build>
