@@ -89,6 +89,9 @@
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 						</manifest>
+						<manifestEntries>
+							<Automatic-Module-Name>io.ipfs.multiaddr</Automatic-Module-Name>
+						</manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>
