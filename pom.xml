@@ -4,8 +4,7 @@
 
     <groupId>com.github.multiformats</groupId>
     <artifactId>java-multiaddr</artifactId>
-	<version>v1.3.1</version>
-	<packaging>jar</packaging>
+	<version>v1.3.2</version>
 
 	<name>multiaddr</name>
 	<url>https://github.com/multiformats/java-multiaddr</url>
@@ -89,6 +88,9 @@
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 						</manifest>
+						<manifestEntries>
+							<Automatic-Module-Name>io.ipfs.multiaddr</Automatic-Module-Name>
+						</manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>
