@@ -81,6 +81,7 @@ public class MultiAddressTest {
                 "/tcp/1234/https",
                 "/tcp/1234/ws",
                 "/ipfs/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC/tcp/1234",
+                "/p2p/QmcgpsyWgH8Y8ajJz1Cu72KnS5uo2Aa2LpzU7kinSupNKC/tcp/1234",
                 "/ip4/127.0.0.1/udp/1234",
                 "/ip4/127.0.0.1/udp/0",
                 "/ip4/127.0.0.1/tcp/1234",
