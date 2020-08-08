@@ -141,21 +141,13 @@ public class MultiAddressTest {
             throw new IllegalStateException("Should be equal!");
     }
 
-    @Test
-    public void stringToBytes() {
-        BiConsumer<String, String> test = (s, h) -> {
-            if (!Arrays.equals(new MultiAddress(s).getBytes(), fromHex(h))) throw new IllegalStateException(s + " bytes != " + new MultiAddress(fromHex(h)));
-        };
-
-        test.accept("/ip4/127.0.0.1/udp/1234", "047f000001910204d2");
-        test.accept("/ip4/127.0.0.1/tcp/4321", "047f0000010610e1");
-        test.accept("/ip4/127.0.0.1/udp/1234/ip4/127.0.0.1/tcp/4321", "047f000001910204d2047f0000010610e1");
-    }
-
    @Test
-    public void bytesToString() {
+    public void conversion() {
         BiConsumer<String, String> test = (s, h) -> {
-            if (!s.equals(new MultiAddress(fromHex(h)).toString())) throw new IllegalStateException(s + " != " + new MultiAddress(fromHex(h)));
+            if (!s.equals(new MultiAddress(fromHex(h)).toString()))
+                throw new IllegalStateException(s + " != " + new MultiAddress(fromHex(h)));
+            if (! Arrays.equals(new MultiAddress(s).getBytes(), fromHex(h)))
+                throw new IllegalStateException("bytes for " + s + " != " + new MultiAddress(fromHex(h)));
         };
 
         test.accept("/ip4/159.89.141.29/udp/5491/quic", "049f598d1d91021573cc03");

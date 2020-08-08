@@ -140,6 +140,32 @@ public class Protocol {
                     dout.flush();
                     return b.toByteArray();
                 }
+                case ONION3: {
+                    String[] split = addr.split(":");
+                    if (split.length != 2)
+                        throw new IllegalStateException("Onion3 address needs a port: " + addr);
+
+                    // onion3 address without the ".onion" substring
+                    if (split[0].length() != 56)
+                        throw new IllegalStateException("failed to parse " + name() + " addr: " + addr + " not a Tor onion3 address.");
+
+                    byte[] onionHostBytes = Multibase.decode(Multibase.Base.Base32.prefix + split[0]);
+                    if (onionHostBytes.length != 35)
+                        throw new IllegalStateException("Invalid onion3 address host: " + split[0]);
+                    int port = Integer.parseInt(split[1]);
+                    if (port > 65535)
+                        throw new IllegalStateException("Port is > 65535: " + port);
+
+                    if (port < 1)
+                        throw new IllegalStateException("Port is < 1: " + port);
+
+                    ByteArrayOutputStream b = new ByteArrayOutputStream();
+                    DataOutputStream dout = new DataOutputStream(b);
+                    dout.write(onionHostBytes);
+                    dout.writeShort(port);
+                    dout.flush();
+                    return b.toByteArray();
+                }
                 case UNIX: {
                     if (addr.startsWith("/"))
                         addr = addr.substring(1);
