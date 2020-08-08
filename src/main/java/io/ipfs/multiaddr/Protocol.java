@@ -16,6 +16,7 @@ public class Protocol {
         TCP(6, 16, "tcp"),
         DCCP(33, 16, "dccp"),
         IP6(41, 128, "ip6"),
+        DNS(53, LENGTH_PREFIXED_VAR_SIZE, "dns"),
         DNS4(54, LENGTH_PREFIXED_VAR_SIZE, "dns4"),
         DNS6(55, LENGTH_PREFIXED_VAR_SIZE, "dns6"),
         DNSADDR(56, LENGTH_PREFIXED_VAR_SIZE, "dnsaddr"),
