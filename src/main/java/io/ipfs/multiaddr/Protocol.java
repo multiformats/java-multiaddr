@@ -178,7 +178,20 @@ public class Protocol {
                     }
 
                     ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                    byte[] hashBytes =  Multibase.decode(Multibase.Base.Base32.prefix + addr);;
+                    byte[] hashBytes =  Multibase.decode(Multibase.Base.Base32.prefix + addr);
+                    byte[] varint = new byte[(32 - Integer.numberOfLeadingZeros(hashBytes.length) + 6) / 7];
+                    putUvarint(varint, hashBytes.length);
+                    bout.write(varint);
+                    bout.write(hashBytes);
+                    return bout.toByteArray();
+                } case GARLIC64: {
+                    // i2p base64 address will be between 516 and 616 characters long, depending on certificate type
+                    if (addr.length() < 516 || addr.length() > 616 || addr.contains(":")) {
+                        throw new IllegalStateException(String.format("Invalid garlic addr: %s not a i2p base64 address. len: %d", addr, addr.length()));
+                    }
+
+                    ByteArrayOutputStream bout = new ByteArrayOutputStream();
+                    byte[] hashBytes =  Multibase.decode(Multibase.Base.Base64.prefix + addr.replaceAll("-", "+").replaceAll("~", "/"));
                     byte[] varint = new byte[(32 - Integer.numberOfLeadingZeros(hashBytes.length) + 6) / 7];
                     putUvarint(varint, hashBytes.length);
                     bout.write(varint);
@@ -250,12 +263,20 @@ public class Protocol {
             } case GARLIC32: {
                 buf = new byte[sizeForAddress];
                 read(in, buf);
-                // an i2p base64 for an Encrypted Leaseset v2 will be at least 35 bytes
+                // an i2p base32 for an Encrypted Leaseset v2 will be at least 35 bytes
                 // long other than that, they will be exactly 32 bytes
                 if (buf.length < 35 && buf.length != 32) {
                     throw new IllegalStateException("Invalid garlic addr length: " + buf.length);
                 }
                 return Multibase.encode(Multibase.Base.Base32, buf).substring(1);
+            } case GARLIC64: {
+                buf = new byte[sizeForAddress];
+                read(in, buf);
+                // A garlic64 address will always be greater than 386 bytes
+                if (buf.length < 386) {
+                    throw new IllegalStateException("Invalid garlic64 addr length: " + buf.length);
+                }
+                return Multibase.encode(Multibase.Base.Base64, buf).substring(1).replaceAll("\\+", "-").replaceAll("/", "~");
             } case UNIX:
                 buf = new byte[sizeForAddress];
                 read(in, buf);
