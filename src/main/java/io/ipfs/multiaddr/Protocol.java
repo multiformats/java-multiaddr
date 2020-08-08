@@ -13,7 +13,7 @@ public class Protocol {
     enum Type {
         IP4(4, 32, "ip4"),
         TCP(6, 16, "tcp"),
-        UDP(17, 16, "udp"),
+        UDP(273, 16, "udp"),
         DCCP(33, 16, "dccp"),
         IP6(41, 128, "ip6"),
         DNS4(54, LENGTH_PREFIXED_VAR_SIZE, "dns4"),

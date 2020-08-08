@@ -140,9 +140,9 @@ public class MultiAddressTest {
             if (!Arrays.equals(new MultiAddress(s).getBytes(), fromHex(h))) throw new IllegalStateException(s + " bytes != " + new MultiAddress(fromHex(h)));
         };
 
-        test.accept("/ip4/127.0.0.1/udp/1234", "047f0000011104d2");
+        test.accept("/ip4/127.0.0.1/udp/1234", "047f000001910204d2");
         test.accept("/ip4/127.0.0.1/tcp/4321", "047f0000010610e1");
-        test.accept("/ip4/127.0.0.1/udp/1234/ip4/127.0.0.1/tcp/4321", "047f0000011104d2047f0000010610e1");
+        test.accept("/ip4/127.0.0.1/udp/1234/ip4/127.0.0.1/tcp/4321", "047f000001910204d2047f0000010610e1");
     }
 
    @Test
@@ -151,9 +151,9 @@ public class MultiAddressTest {
             if (!s.equals(new MultiAddress(fromHex(h)).toString())) throw new IllegalStateException(s + " != " + new MultiAddress(fromHex(h)));
         };
 
-        test.accept("/ip4/127.0.0.1/udp/1234", "047f0000011104d2");
+        test.accept("/ip4/127.0.0.1/udp/1234", "047f000001910204d2");
         test.accept("/ip4/127.0.0.1/tcp/4321", "047f0000010610e1");
-        test.accept("/ip4/127.0.0.1/udp/1234/ip4/127.0.0.1/tcp/4321", "047f0000011104d2047f0000010610e1");
+        test.accept("/ip4/127.0.0.1/udp/1234/ip4/127.0.0.1/tcp/4321", "047f000001910204d2047f0000010610e1");
     }
 
    @Test
