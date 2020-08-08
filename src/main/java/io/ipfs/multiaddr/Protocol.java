@@ -1,5 +1,6 @@
 package io.ipfs.multiaddr;
 
+import io.ipfs.multibase.*;
 import io.ipfs.multihash.Multihash;
 import io.ipfs.cid.Cid;
 import java.io.*;
@@ -13,13 +14,13 @@ public class Protocol {
     enum Type {
         IP4(4, 32, "ip4"),
         TCP(6, 16, "tcp"),
-        UDP(17, 16, "udp"),
         DCCP(33, 16, "dccp"),
         IP6(41, 128, "ip6"),
         DNS4(54, LENGTH_PREFIXED_VAR_SIZE, "dns4"),
         DNS6(55, LENGTH_PREFIXED_VAR_SIZE, "dns6"),
         DNSADDR(56, LENGTH_PREFIXED_VAR_SIZE, "dnsaddr"),
         SCTP(132, 16, "sctp"),
+        UDP(273, 16, "udp"),
         UTP(301, 0, "utp"),
         UDT(302, 0, "udt"),
         UNIX(400, LENGTH_PREFIXED_VAR_SIZE, "unix"),
@@ -27,8 +28,12 @@ public class Protocol {
         IPFS(421, LENGTH_PREFIXED_VAR_SIZE, "ipfs"),
         HTTPS(443, 0, "https"),
         ONION(444, 80, "onion"),
+        ONION3(445, 296, "onion3"),
+        GARLIC64(446, LENGTH_PREFIXED_VAR_SIZE, "garlic64"),
+        GARLIC32(447, LENGTH_PREFIXED_VAR_SIZE, "garlic32"),
         QUIC(460, 0, "quic"),
         WS(477, 0, "ws"),
+        WSS(478, 0, "wss"),
         P2PCIRCUIT(290, 0, "p2p-circuit"),
         HTTP(480, 0, "http");
 
@@ -118,7 +123,9 @@ public class Protocol {
                     if (split[0].length() != 16)
                         throw new IllegalStateException("failed to parse " + name() + " addr: " + addr + " not a Tor onion address.");
 
-                    byte[] onionHostBytes = Base32.decode(split[0].toUpperCase());
+                    byte[] onionHostBytes = Multibase.decode(Multibase.Base.Base32.prefix + split[0]);
+                    if (onionHostBytes.length != 10)
+                        throw new IllegalStateException("Invalid onion address host: " + split[0]);
                     int port = Integer.parseInt(split[1]);
                     if (port > 65535)
                         throw new IllegalStateException("Port is > 65535: " + port);
@@ -186,12 +193,17 @@ public class Protocol {
                 buf = new byte[sizeForAddress];
                 read(in, buf);
                 return Cid.cast(buf).toString();
-            case ONION:
+            case ONION: {
                 byte[] host = new byte[10];
                 read(in, host);
                 String port = Integer.toString((in.read() << 8) | (in.read()));
-                return Base32.encode(host)+":"+port;
-            case UNIX:
+                return Multibase.encode(Multibase.Base.Base32, host).substring(1) + ":" + port;
+            } case ONION3: {
+                byte[] host = new byte[35];
+                read(in, host);
+                String port = Integer.toString((in.read() << 8) | (in.read()));
+                return Multibase.encode(Multibase.Base.Base32, host).substring(1) + ":" + port;
+            } case UNIX:
                 buf = new byte[sizeForAddress];
                 read(in, buf);
                 return new String(buf);
