@@ -165,8 +165,26 @@ public class Protocol {
                     dout.writeShort(port);
                     dout.flush();
                     return b.toByteArray();
-                }
-                case UNIX: {
+                } case GARLIC32: {
+                    // an i2p base32 address with a length of greater than 55 characters is
+                    // using an Encrypted Leaseset v2. all other base32 addresses will always be
+                    // exactly 52 characters
+                    if (addr.length() < 55 && addr.length() != 52 || addr.contains(":")) {
+                        throw new IllegalStateException(String.format("Invalid garlic addr: %s not a i2p base32 address. len: %d", addr, addr.length()));
+                    }
+
+                    while (addr.length() % 8 != 0) {
+                        addr += "=";
+                    }
+
+                    ByteArrayOutputStream bout = new ByteArrayOutputStream();
+                    byte[] hashBytes =  Multibase.decode(Multibase.Base.Base32.prefix + addr);;
+                    byte[] varint = new byte[(32 - Integer.numberOfLeadingZeros(hashBytes.length) + 6) / 7];
+                    putUvarint(varint, hashBytes.length);
+                    bout.write(varint);
+                    bout.write(hashBytes);
+                    return bout.toByteArray();
+                } case UNIX: {
                     if (addr.startsWith("/"))
                         addr = addr.substring(1);
                     byte[] path = addr.getBytes();
@@ -229,6 +247,15 @@ public class Protocol {
                 read(in, host);
                 String port = Integer.toString((in.read() << 8) | (in.read()));
                 return Multibase.encode(Multibase.Base.Base32, host).substring(1) + ":" + port;
+            } case GARLIC32: {
+                buf = new byte[sizeForAddress];
+                read(in, buf);
+                // an i2p base64 for an Encrypted Leaseset v2 will be at least 35 bytes
+                // long other than that, they will be exactly 32 bytes
+                if (buf.length < 35 && buf.length != 32) {
+                    throw new IllegalStateException("Invalid garlic addr length: " + buf.length);
+                }
+                return Multibase.encode(Multibase.Base.Base32, buf).substring(1);
             } case UNIX:
                 buf = new byte[sizeForAddress];
                 read(in, buf);
