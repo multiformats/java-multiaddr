@@ -191,7 +191,7 @@ public class MultiAddressTest {
        MultiAddress multiAddress = new MultiAddress(address);
        
        Assert.assertEquals("host should be equal to " + dns, dns, multiAddress.getHost());
-       Assert.assertEquals("port should be equal to " + port, port, multiAddress.getTCPPort());
+       Assert.assertEquals("port should be equal to " + port, port, multiAddress.getPort());
     }
 
     public static byte[] fromHex(String hex) {
