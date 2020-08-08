@@ -49,7 +49,7 @@ public class MultiAddress
         String[] parts = toString().substring(1).split("/");
         if (parts[2].startsWith("tcp") || parts[2].startsWith("udp"))
             return Integer.parseInt(parts[3]);
-        throw new IllegalStateException("This multiaddress doesn't have a tcp port: "+toString());
+        throw new IllegalStateException("This multiaddress doesn't have a port: "+toString());
     }
 
     private static byte[] decodeFromString(String addr) {
