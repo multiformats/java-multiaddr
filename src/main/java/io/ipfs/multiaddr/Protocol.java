@@ -16,12 +16,15 @@ public class Protocol {
         TCP(6, 16, "tcp"),
         DCCP(33, 16, "dccp"),
         IP6(41, 128, "ip6"),
+        IP6ZONE(42, LENGTH_PREFIXED_VAR_SIZE, "ip6zone"),
+        IPCIDR(43, 8, "ipcidr"),
         DNS(53, LENGTH_PREFIXED_VAR_SIZE, "dns"),
         DNS4(54, LENGTH_PREFIXED_VAR_SIZE, "dns4"),
         DNS6(55, LENGTH_PREFIXED_VAR_SIZE, "dns6"),
         DNSADDR(56, LENGTH_PREFIXED_VAR_SIZE, "dnsaddr"),
         SCTP(132, 16, "sctp"),
         UDP(273, 16, "udp"),
+        P2PWEBRTC(276, 0, "p2p-webrtc-direct"),
         UTP(301, 0, "utp"),
         UDT(302, 0, "udt"),
         UNIX(400, LENGTH_PREFIXED_VAR_SIZE, "unix"),
@@ -32,7 +35,11 @@ public class Protocol {
         ONION3(445, 296, "onion3"),
         GARLIC64(446, LENGTH_PREFIXED_VAR_SIZE, "garlic64"),
         GARLIC32(447, LENGTH_PREFIXED_VAR_SIZE, "garlic32"),
+        TLS(448, 0, "tls"),
+        NOISE(454, 0, "noise"),
         QUIC(460, 0, "quic"),
+        WEBTRANSPORT(465, 0, "webtransport"),
+        CERTHASH(466, LENGTH_PREFIXED_VAR_SIZE, "certhash"),
         WS(477, 0, "ws"),
         WSS(478, 0, "wss"),
         P2PCIRCUIT(290, 0, "p2p-circuit"),
@@ -96,6 +103,14 @@ public class Protocol {
                     return Inet4Address.getByName(addr).getAddress();
                 case IP6:
                     return Inet6Address.getByName(addr).getAddress();
+                case IPCIDR:
+                    return new byte[] {Byte.parseByte(addr)};
+                case IP6ZONE:
+                    if (addr.isEmpty())
+                        throw new IllegalStateException("Empty IPv6 zone!");
+                    if (addr.contains("/"))
+                        throw new IllegalStateException("IPv6 zone ID contains '/'");
+                    return addr.getBytes();
                 case TCP:
                 case UDP:
                 case DCCP:
@@ -106,7 +121,15 @@ public class Protocol {
                     return new byte[]{(byte)(x >>8), (byte)x};
                 case P2P:
                 case IPFS: {
-                    Multihash hash = Cid.decode(addr);
+                    Multihash hash;
+                    if (addr.startsWith("Qm") || addr.startsWith("1"))
+                        hash = Multihash.fromBase58(addr);
+                    else {
+                        Cid cid = Cid.decode(addr);
+                        if (cid.codec != Cid.Codec.Libp2pKey)
+                            throw new IllegalStateException("failed to parse p2p addr: " + addr + " has the invalid codec " + cid.codec);
+                        hash = new Multihash(cid.getType(), cid.getHash());
+                    }
                     ByteArrayOutputStream bout = new ByteArrayOutputStream();
                     byte[] hashBytes = hash.toBytes();
                     byte[] varint = new byte[(32 - Integer.numberOfLeadingZeros(hashBytes.length) + 6) / 7];
@@ -115,6 +138,10 @@ public class Protocol {
                     bout.write(hashBytes);
                     return bout.toByteArray();
                 }
+                case CERTHASH:
+                    byte[] raw = Multibase.decode(addr);
+                    Multihash.deserialize(raw);
+                    return raw;
                 case ONION: {
                     String[] split = addr.split(":");
                     if (split.length != 2)
@@ -242,6 +269,12 @@ public class Protocol {
                 buf = new byte[sizeForAddress];
                 read(in, buf);
                 return Inet6Address.getByAddress(buf).toString().substring(1);
+            case IPCIDR:
+                return Integer.toString(in.read());
+            case IP6ZONE:
+                buf = new byte[sizeForAddress];
+                read(in, buf);
+                return new String(buf);
             case TCP:
             case UDP:
             case DCCP:
@@ -250,7 +283,11 @@ public class Protocol {
             case IPFS:
                 buf = new byte[sizeForAddress];
                 read(in, buf);
-                return Cid.cast(buf).toString();
+                return Multihash.deserialize(buf).toString();
+            case CERTHASH:
+                buf = new byte[sizeForAddress];
+                read(in, buf);
+                return Multibase.encode(Multibase.Base.Base64, buf);
             case ONION: {
                 byte[] host = new byte[10];
                 read(in, host);
