@@ -320,6 +320,7 @@ public class Protocol {
                 buf = new byte[sizeForAddress];
                 read(in, buf);
                 return new String(buf);
+            case DNS:
             case DNS4:
             case DNS6:
             case DNSADDR:
