@@ -238,6 +238,7 @@ public class Protocol {
                     dout.flush();
                     return b.toByteArray();
                 }
+                case DNS:
                 case DNS4:
                 case DNS6:
                 case DNSADDR: {
