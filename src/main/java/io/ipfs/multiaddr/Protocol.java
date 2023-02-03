@@ -25,6 +25,7 @@ public class Protocol {
         SCTP(132, 16, "sctp"),
         UDP(273, 16, "udp"),
         P2PWEBRTC(276, 0, "p2p-webrtc-direct"),
+        WEBRTC(280, 0, "webrtc"),
         UTP(301, 0, "utp"),
         UDT(302, 0, "udt"),
         UNIX(400, LENGTH_PREFIXED_VAR_SIZE, "unix"),
@@ -36,8 +37,10 @@ public class Protocol {
         GARLIC64(446, LENGTH_PREFIXED_VAR_SIZE, "garlic64"),
         GARLIC32(447, LENGTH_PREFIXED_VAR_SIZE, "garlic32"),
         TLS(448, 0, "tls"),
+        SNI(449, LENGTH_PREFIXED_VAR_SIZE, "sni"),
         NOISE(454, 0, "noise"),
         QUIC(460, 0, "quic"),
+        QUIC_V1(461, 0, "quic-v1"),
         WEBTRANSPORT(465, 0, "webtransport"),
         CERTHASH(466, LENGTH_PREFIXED_VAR_SIZE, "certhash"),
         WS(477, 0, "ws"),
@@ -138,10 +141,16 @@ public class Protocol {
                     bout.write(hashBytes);
                     return bout.toByteArray();
                 }
-                case CERTHASH:
+                case CERTHASH: {
                     byte[] raw = Multibase.decode(addr);
                     Multihash.deserialize(raw);
-                    return raw;
+                    ByteArrayOutputStream bout = new ByteArrayOutputStream();
+                    byte[] varint = new byte[(32 - Integer.numberOfLeadingZeros(raw.length) + 6) / 7];
+                    putUvarint(varint, raw.length);
+                    bout.write(varint);
+                    bout.write(raw);
+                    return bout.toByteArray();
+                }
                 case ONION: {
                     String[] split = addr.split(":");
                     if (split.length != 2)
@@ -288,7 +297,7 @@ public class Protocol {
             case CERTHASH:
                 buf = new byte[sizeForAddress];
                 read(in, buf);
-                return Multibase.encode(Multibase.Base.Base64, buf);
+                return Multibase.encode(Multibase.Base.Base64Url, buf);
             case ONION: {
                 byte[] host = new byte[10];
                 read(in, host);
