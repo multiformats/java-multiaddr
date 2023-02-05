@@ -88,6 +88,7 @@ public class MultiAddressTest {
                 "/ip6zone/x%y/ip6/::",
                 "/ip6zone/x/ip6/fe80::1/udp/1234/quic",
                 "/ip6/::1/udp/4001/quic-v1",
+                "/dnsaddr/bootstrap.libp2p.io/ipfs/QmbLHAnMoJPWSCR5Zhtx6BHJX9KiKNN6tpvbUcqanj75Nb",
                 "/ip4/127.0.0.1/udp/4001/quic-v1/webtransport/certhash/uEiBwuhj7sQdRxdMIppgEp5kx2XTfYtSUE_8ukOpi8TRPRw/certhash/uEiD8fBEvx4OOkDOdeknjNkpiFWBOEqJYOjwsFdBJobIJNA",
                 "/onion/timaq4ygg2iegci7:1234",
                 "/onion/timaq4ygg2iegci7:80/http",
