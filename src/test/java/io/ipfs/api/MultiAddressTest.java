@@ -74,6 +74,42 @@ public class MultiAddressTest {
     }
 
     @Test
+    public void publicIps() {
+        List<MultiAddress> pub = Stream.of("/ip4/8.8.8.8")
+                .map(MultiAddress::new)
+                .collect(Collectors.toList());
+        for (MultiAddress addr : pub) {
+            Assert.assertTrue(addr.toString() + " is public", addr.isPublic(false));
+        }
+        List<MultiAddress> priv = Stream.of(
+//                "/ip4/100.64.0.0",
+                        "/ip4/172.16.0.0",
+                        "/ip4/10.0.0.0",
+                        "/ip4/169.254.0.0",
+                        "/ip4/192.168.0.0",
+                        "/ip4/127.0.0.1",
+                        "/ip4/0.0.0.0",
+//                        "/ip4/192.0.0.0",
+//                        "/ip4/192.0.2.0",
+//                        "/ip4/192.88.99.0",
+//                        "/ip4/198.18.0.0",
+//                        "/ip4/198.51.100.0",
+//                        "/ip4/203.0.113.0",
+//                        "/ip4/224.0.0.0",
+//                        "/ip4/240.0.0.0",
+//                        "/ip4/255.255.255.255",
+                        "/ip6/::1",
+//                        "/ip6/fc00::",
+//                        "/ip6/ff00::",
+                        "/ip6/fe80::"
+                ).map(MultiAddress::new)
+                .collect(Collectors.toList());
+        for (MultiAddress addr : priv) {
+            Assert.assertTrue(addr.toString() + " is private", ! addr.isPublic(false));
+        }
+    }
+
+    @Test
     public void succeeds() {
         List<String> failed = Stream.of(
                 "/ip4/1.2.3.4",

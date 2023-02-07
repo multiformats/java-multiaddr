@@ -3,6 +3,7 @@ package io.ipfs.multiaddr;
 import io.ipfs.multihash.*;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 import java.util.stream.*;
 
@@ -27,6 +28,29 @@ public class MultiAddress
         return Arrays.copyOfRange(raw, 0, raw.length);
     }
 
+    public boolean isRelayed() {
+        String[] parts = toString().substring(1).split("/");
+        return Arrays.asList(parts).contains("/p2p-circuit");
+    }
+
+    public boolean isPublic(boolean testReachable) {
+        String[] parts = toString().substring(1).split("/");
+        try {
+            for (int i = 0; i < parts.length; i++) {
+                if (parts[i].equals(Protocol.Type.IP6ZONE.name))
+                    return true;
+                if (parts[i].equals(Protocol.Type.IP4.name) || parts[i].equals(Protocol.Type.IP6.name)) {
+                    InetAddress ip = InetAddress.getByName(parts[i + 1]);
+                    if (ip.isLoopbackAddress() || ip.isSiteLocalAddress() || ip.isLinkLocalAddress() || ip.isAnyLocalAddress())
+                        return false;
+                    return !testReachable || ip.isReachable(1000);
+                }
+            }
+        } catch (UnknownHostException e) {}
+        catch (IOException e) {}
+        return false;
+    }
+    
     public boolean isTCPIP() {
         String[] parts = toString().substring(1).split("/");
         if (parts.length != 4)
@@ -72,7 +96,7 @@ public class MultiAddress
                         Stream.of(Arrays.copyOfRange(parts, i, parts.length)).reduce("", (a, b) -> a + "/" + b) :
                         parts[i++];
                 if (component.length() == 0)
-                    throw new IllegalStateException("Protocol requires address, but non provided!");
+                    throw new IllegalStateException("Protocol requires address, but none provided!");
 
                 bout.write(p.addressToBytes(component));
                 if (p.isTerminal())
