@@ -29,8 +29,12 @@ public class MultiAddress
     }
 
     public boolean isRelayed() {
+        return has(Protocol.get("p2p-circuit"));
+    }
+    
+    public boolean has(Protocol p) {
         String[] parts = toString().substring(1).split("/");
-        return Arrays.asList(parts).contains("/p2p-circuit");
+        return Arrays.asList(parts).contains(p.name());
     }
 
     public boolean isPublic(boolean testReachable) {
