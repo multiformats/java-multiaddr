@@ -33,7 +33,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <version.junit>4.13.2</version.junit>
         <version.hamcrest>2.2</version.hamcrest>
-        <version.cid>v1.3.7</version.cid>
+        <version.cid>v1.3.8</version.cid>
 	</properties>
 
 	<repositories>
