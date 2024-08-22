@@ -2,17 +2,21 @@ package io.ipfs.api;
 
 import io.ipfs.multiaddr.*;
 import io.ipfs.multihash.*;
-import org.junit.*;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class MultiAddressTest {
 
     @Test
-    public void fails() {
+    void fails() {
         List<String> parsed = Stream.of(
                 "/ip4",
                 "/ip4/::1",
@@ -74,12 +78,12 @@ public class MultiAddressTest {
     }
 
     @Test
-    public void publicIps() {
+    void publicIps() {
         List<MultiAddress> pub = Stream.of("/ip4/8.8.8.8")
                 .map(MultiAddress::new)
                 .collect(Collectors.toList());
         for (MultiAddress addr : pub) {
-            Assert.assertTrue(addr.toString() + " is public", addr.isPublic(false));
+            assertTrue(addr.isPublic(false), addr.toString() + " is public");
         }
         List<MultiAddress> priv = Stream.of(
 //                "/ip4/100.64.0.0",
@@ -105,12 +109,12 @@ public class MultiAddressTest {
                 ).map(MultiAddress::new)
                 .collect(Collectors.toList());
         for (MultiAddress addr : priv) {
-            Assert.assertTrue(addr.toString() + " is private", ! addr.isPublic(false));
+            assertFalse(addr.isPublic(false), addr.toString() + " is private");
         }
     }
 
     @Test
-    public void succeeds() {
+    void succeeds() {
         List<String> failed = Stream.of(
                 "/ip4/1.2.3.4",
                 "/ip4/0.0.0.0",
@@ -211,7 +215,7 @@ public class MultiAddressTest {
     }
 
     @Test
-    public void equalsTests() {
+    void equalsTests() {
         MultiAddress m1 = new MultiAddress("/ip4/127.0.0.1/udp/1234");
         MultiAddress m2 = new MultiAddress("/ip4/127.0.0.1/tcp/1234");
         MultiAddress m3 = new MultiAddress("/ip4/127.0.0.1/tcp/1234");
@@ -239,8 +243,8 @@ public class MultiAddressTest {
             throw new IllegalStateException("Should be equal!");
     }
 
-   @Test
-    public void conversion() {
+    @Test
+    void conversion() {
         BiConsumer<String, String> test = (s, h) -> {
             if (!s.equals(new MultiAddress(fromHex(h)).toString()))
                 throw new IllegalStateException(s + " != " + new MultiAddress(fromHex(h)));
@@ -273,15 +277,15 @@ public class MultiAddressTest {
                 "bf0320efbcd45d0c5dc79781ac6f20ea5055a036afb48d45a52e7d68ec7d4338919e69");
     }
 
-   @Test
-    public void dns() {
+    @Test
+    void dns() {
        String dns = "mydomain.com";
        int port = 5001;
        String address = "/dns6/"+dns+"/tcp/"+port+"/https";
        MultiAddress multiAddress = new MultiAddress(address);
        
-       Assert.assertEquals("host should be equal to " + dns, dns, multiAddress.getHost());
-       Assert.assertEquals("port should be equal to " + port, port, multiAddress.getPort());
+       assertEquals(dns, multiAddress.getHost(), "host should be equal to " + dns);
+       assertEquals(port, multiAddress.getPort(), "port should be equal to " + port);
     }
 
     public static byte[] fromHex(String hex) {
