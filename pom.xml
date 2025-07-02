@@ -4,7 +4,7 @@
 
     <groupId>com.github.multiformats</groupId>
     <artifactId>java-multiaddr</artifactId>
-	<version>v1.4.12</version>
+	<version>v1.4.13</version>
 
 	<name>multiaddr</name>
 	<url>https://github.com/multiformats/java-multiaddr</url>
@@ -33,7 +33,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<version.junit>5.11.0</version.junit>
         <version.hamcrest>3.0</version.hamcrest>
-        <version.cid>v1.3.8</version.cid>
+        <version.cid>v1.3.10</version.cid>
 	</properties>
 
 	<repositories>
