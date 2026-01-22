@@ -4,7 +4,7 @@
 
   <groupId>com.github.multiformats</groupId>
   <artifactId>java-multiaddr</artifactId>
-  <version>1.4.14-SNAPSHOT</version>
+  <version>1.5.0</version>
   <packaging>jar</packaging>
 
   <name>multiaddr</name>
