@@ -7,8 +7,8 @@
   <version>1.4.14-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>multibase</name>
-  <url>https://github.com/multiformats/java-multibase</url>
+  <name>multiaddr</name>
+  <url>https://github.com/multiformats/java-multiaddr</url>
 
   <licenses>
     <license>
@@ -19,15 +19,15 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:git://github.com/multiformats/java-multibase.git</connection>
-    <developerConnection>scm:git:git@github.com:multiformats/java-multibase.git</developerConnection>
+    <connection>scm:git:git://github.com/multiformats/java-multiaddr.git</connection>
+    <developerConnection>scm:git:git@github.com:multiformats/java-multiaddr.git</developerConnection>
     <tag>HEAD</tag>
-    <url>https://github.com/multiformats/java-multibase</url>
+    <url>https://github.com/multiformats/java-multiaddr</url>
   </scm>
 
   <issueManagement>
     <system>GitHub Issues</system>
-    <url>https://github.com/multiformats/java-multibase/issues</url>
+    <url>https://github.com/multiformats/java-multiaddr/issues</url>
   </issueManagement>
 
   <properties>
